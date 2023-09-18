@@ -1,22 +1,36 @@
 local ESX = exports["es_extended"]:getSharedObject()
 
-RageMenu:RegisterKey("F2", "F2", "Open Inventory", function()
+RageMenu:RegisterKey("F3", "F3", "Open Inventory", function()
     OpenInventoryMenu()
 end)
 
 function OpenInventoryMenu()
     local mainMenu = RageMenu:CreateMenu('Inventory', 'Inventory')
-    local playerInventory = ESX.GetPlayerData().inventory
+    local playerWeight
 
-    for a, b in pairs(playerInventory) do
-        local subMenu = RageMenu:CreateMenu(b.label, b.name)
+    ESX.TriggerServerCallback('getPlayerWeight', function(weight)
 
-        subMenu:AddButton('Use', 'Use ' .. b.label):On('click', function()
-            TriggerServerEvent('useItem', b.name)
-        end)
+        mainMenu:AddPlaceholder("Weight: " .. weight .. " kg")
+        local playerInventory = ESX.GetPlayerData().inventory
 
-        mainMenu:AddSubmenu(subMenu, b.label, b.name)
-    end
+        for a, b in pairs(playerInventory) do
+            local subMenu = RageMenu:CreateMenu(b.label, b.label)
 
-    RageMenu:OpenMenu(mainMenu)
+            subMenu:AddButton('Use', 'Use ' .. b.label):On('click', function()
+                TriggerServerEvent('useItem', b.name)
+            end)
+
+            subMenu:AddButton('Give', 'Give ' .. b.label):On('click', function()
+                -- code
+            end)
+
+            subMenu:AddButton('Drop', 'Drop ' .. b.label):On('click', function()
+                TriggerServerEvent('dropItem', b.name)
+            end)
+
+            mainMenu:AddSubmenu(subMenu, b.label, b.label)
+        end
+
+        RageMenu:OpenMenu(mainMenu)
+    end)
 end
